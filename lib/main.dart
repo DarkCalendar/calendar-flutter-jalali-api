@@ -59,7 +59,17 @@ class _MyAppState extends State<MyApp> {
     for (var i = 0; i < chunks.length; i++){
       
        var rowCells = chunks[i].map((item) {
-        return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}'));
+        if(item['to_day']){
+          return DataCell(Tooltip(
+                message: 'امروز',
+                child: Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(backgroundColor: Color.fromARGB(255, 21, 75, 21)),),
+              ));
+        }
+        if(item['is_month']){
+          return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}'));
+        }
+        
+        return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(color: Color.fromARGB(169, 169, 169, 1)),));
        }).toList();
        print(rowCells.length);
        if(rowCells.length == 7){
