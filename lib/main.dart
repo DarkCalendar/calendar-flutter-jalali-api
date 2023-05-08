@@ -21,7 +21,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   void fetchData() async {
-    var url = Uri.parse('http://127.0.0.1:8000/api/get');
+    // var url = Uri.parse('http://127.0.0.1:8000/api/get');
+    var url = Uri.parse('https://gist.githubusercontent.com/DevNull-IR/01459bf845a6bce2b0ffccdf961b1f4f/raw/8891dfa82c6a66aef42af76a8e8fbd0cf9c50378/api_test_date_and_time_jalali.json');
     var response = await http.get(url);
 
     if (response.statusCode == 200) {
