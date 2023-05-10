@@ -153,8 +153,8 @@ class _MyAppState extends State<MyApp> {
               appBar: AppBar(
               bottom: TabBar(
                 tabs: [
-                  Tab(icon: Icon(Icons.home), text: 'Home'),
-                  Tab(icon: Icon(Icons.settings), text: 'Browse'),
+                  Tab(icon: Icon(Icons.home), text: 'Calendar'),
+                  Tab(icon: Icon(Icons.settings), text: 'Setting'),
                 ],
               ),
               title: Text('جدول از داده‌های جیسون'),
