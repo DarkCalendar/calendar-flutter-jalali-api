@@ -70,6 +70,10 @@ class _MyAppState extends State<MyApp> {
         if(item['is_month']){
           return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}'));
         }
+        if(item['closed']){
+        return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(color: Color.fromARGB(255, 129, 0, 0)),));
+
+        }
         
         return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(color: Color.fromARGB(169, 169, 169, 1)),));
        }).toList();
