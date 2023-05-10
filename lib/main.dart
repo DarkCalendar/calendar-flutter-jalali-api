@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
 
 void main() => runApp(MyApp());
@@ -69,10 +70,32 @@ class _MyAppState extends State<MyApp> {
           ColorReturn = [255, 129, 0, 0];
         }
         if(item['to_day']){
-          return DataCell(Tooltip(
+          
+          return DataCell(OutlinedButton(
+            onPressed: () {
+              showDialog(
+         context: context,
+         builder: (BuildContext context) {
+            return AlertDialog(
+               title: new Text("Alert Title"),
+               content: new Text("This is an alert message."),
+               actions: <Widget>[
+                  new ElevatedButton(
+                     child: new Text("Close"),
+                     onPressed: () {
+                        Navigator.of(context).pop();
+                     },
+                  ),
+               ],
+            );
+         },
+      );
+            },
+            child: Tooltip(
                 message: 'امروز',
                 child: Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(backgroundColor: Color.fromARGB(255, 21, 75, 21)),),
-              ));
+              ),
+          ));
         }
         
         // return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(color: Color.fromARGB(169, 169, 169, 1)),));
@@ -112,6 +135,14 @@ class _MyAppState extends State<MyApp> {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: MaterialApp(
+        localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en', 'US'), // زبان انگلیسی
+        const Locale('fa', 'IR'), // زبان فارسی
+      ],
         home: Scaffold(
           appBar: AppBar(
             title: Text('جدول از داده‌های جیسون'),

@@ -2,6 +2,7 @@
 
 [![Codemagic build status](https://api.codemagic.io/apps/645a943538b993ee8b9d56f2/645a943538b993ee8b9d56f1/status_badge.svg)](https://codemagic.io/apps/645a943538b993ee8b9d56f2/645a943538b993ee8b9d56f1/latest_build)
 
+
 A new Flutter project.
 
 ## Getting Started
