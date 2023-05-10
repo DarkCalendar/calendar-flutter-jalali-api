@@ -147,11 +147,22 @@ class _MyAppState extends State<MyApp> {
           primarySwatch: Colors.blue
         ),
         debugShowCheckedModeBanner: false,
-        home: Builder(
+        home: DefaultTabController(
+          length: 2,
+          child: Scaffold(
+              appBar: AppBar(
+              bottom: TabBar(
+                tabs: [
+                  Tab(icon: Icon(Icons.home), text: 'Home'),
+                  Tab(icon: Icon(Icons.settings), text: 'Browse'),
+                ],
+              ),
+              title: Text('جدول از داده‌های جیسون'),
+            ),
+            body: TabBarView(
+              children: [
+                Builder(
           builder: (context) => Scaffold(
-          appBar: AppBar(
-            title: Text('جدول از داده‌های جیسون'),
-          ),
           body: Center(
             child: data.isEmpty 
               ? CircularProgressIndicator() // show loading indicator if data is not fetched yet
@@ -161,6 +172,11 @@ class _MyAppState extends State<MyApp> {
               ), // show the data table when data is available
           ),
         ),
+        ),
+                Center(child: Text('This is the browse page')),
+              ],
+            ),
+          ),
         )
       ),
     );
