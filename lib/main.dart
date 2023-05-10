@@ -4,7 +4,18 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
 
 void main() => runApp(MyApp());
+void testAlert(BuildContext context) {
+  var alert = AlertDialog(
+    title: Text("Test"),
+    content: Text("Done..!"),
+  );
 
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+  });
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -72,30 +83,26 @@ class _MyAppState extends State<MyApp> {
         if(item['to_day']){
           
           return DataCell(OutlinedButton(
+            // backgroundColor: Color.fromARGB(255, 21, 75, 21)
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Color.fromARGB(255, 8, 94, 27),
+              side: BorderSide(
+                color: Colors.transparent
+              )
+              // textStyle: Color.fromARGB(255, 0, 0, 0)
+            ),
             onPressed: () {
-              showDialog(
-         context: context,
-         builder: (BuildContext context) {
-            return AlertDialog(
-               title: new Text("Alert Title"),
-               content: new Text("This is an alert message."),
-               actions: <Widget>[
-                  new ElevatedButton(
-                     child: new Text("Close"),
-                     onPressed: () {
-                        Navigator.of(context).pop();
-                     },
-                  ),
-               ],
-            );
-         },
-      );
+              print("Hello");
+              print(context);
+              testAlert(context);
             },
             child: Tooltip(
                 message: 'امروز',
-                child: Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(backgroundColor: Color.fromARGB(255, 21, 75, 21)),),
+                child: Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),),
               ),
-          ));
+          )
+          );
+            
         }
         
         // return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(color: Color.fromARGB(169, 169, 169, 1)),));
@@ -135,15 +142,13 @@ class _MyAppState extends State<MyApp> {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: MaterialApp(
-        localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: [
-        const Locale('en', 'US'), // زبان انگلیسی
-        const Locale('fa', 'IR'), // زبان فارسی
-      ],
-        home: Scaffold(
+        title: 'Calendar API',
+        theme: ThemeData(
+          primarySwatch: Colors.blue
+        ),
+        debugShowCheckedModeBanner: false,
+        home: Builder(
+          builder: (context) => Scaffold(
           appBar: AppBar(
             title: Text('جدول از داده‌های جیسون'),
           ),
@@ -156,6 +161,7 @@ class _MyAppState extends State<MyApp> {
               ), // show the data table when data is available
           ),
         ),
+        )
       ),
     );
   }
