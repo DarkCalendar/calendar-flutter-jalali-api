@@ -61,21 +61,22 @@ class _MyAppState extends State<MyApp> {
     for (var i = 0; i < chunks.length; i++){
       
        var rowCells = chunks[i].map((item) {
+        var ColorReturn = [255, 0, 0, 0];
+        if(! item['is_month']) {
+          ColorReturn = [169, 169, 169, 1];
+        }
+        if(item['closed'] && item['is_month']){
+          ColorReturn = [255, 129, 0, 0];
+        }
         if(item['to_day']){
           return DataCell(Tooltip(
                 message: 'امروز',
                 child: Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(backgroundColor: Color.fromARGB(255, 21, 75, 21)),),
               ));
         }
-        if(item['is_month']){
-          return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}'));
-        }
-        if(item['closed']){
-        return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(color: Color.fromARGB(255, 129, 0, 0)),));
-
-        }
         
-        return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(color: Color.fromARGB(169, 169, 169, 1)),));
+        // return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(color: Color.fromARGB(169, 169, 169, 1)),));
+        return DataCell(Text('${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}', style: TextStyle(color: Color.fromARGB(ColorReturn[0], ColorReturn[1], ColorReturn[2], ColorReturn[3])),));
        }).toList();
        print(rowCells.length);
        if(rowCells.length == 7){
@@ -99,8 +100,14 @@ class _MyAppState extends State<MyApp> {
       ...rows_chunk
     ];
 
+
     // create data table
-    DataTable dataTable = DataTable(columns: columns, rows: rows);
+    SingleChildScrollView dataTable = SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: DataTable(columns: columns, rows: rows),
+          );
+    // DataTable dataTable = DataTable(columns: columns, rows: rows);
+
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -112,7 +119,10 @@ class _MyAppState extends State<MyApp> {
           body: Center(
             child: data.isEmpty 
               ? CircularProgressIndicator() // show loading indicator if data is not fetched yet
-              : dataTable, // show the data table when data is available
+              : SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(columns: columns, rows: rows),
+              ), // show the data table when data is available
           ),
         ),
       ),
