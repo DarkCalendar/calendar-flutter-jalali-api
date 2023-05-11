@@ -100,6 +100,18 @@ class _MyAppState extends State<MyApp> with Translate {
         if (item['closed'] && item['is_month']) {
           ColorReturn = [255, 129, 0, 0];
         }
+        var eventList = item['events']['event'];
+        var events = "";
+        if(eventList.containsKey('lunar')){
+          events += eventList['lunar'].entries.toList().join("\n") + "\n";
+        }
+        if(eventList.containsKey('jalali')){
+          events += eventList['jalali'].entries.toList().join("\n")+"\n";
+        }
+        
+        if(eventList.containsKey('gregorian')){
+          events += eventList['gregorian'].entries.toList().join("\n") + "\n";
+        }
         if (item['to_day']) {
           return DataCell(Builder(
             builder: (context) {
