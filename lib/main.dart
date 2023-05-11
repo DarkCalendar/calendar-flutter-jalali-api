@@ -120,7 +120,7 @@ class _MyAppState extends State<MyApp> with Translate {
                     backgroundColor: Color.fromARGB(255, 8, 94, 27),
                     side: BorderSide(color: Colors.transparent)),
                 onPressed: () {
-                  testAlert(context, 'رویداد ها', 'اینم رویداد ها\nیکی دیگه');
+                  testAlert(context, events);
                 },
                 child: Tooltip(
                   message: 'امروز',
