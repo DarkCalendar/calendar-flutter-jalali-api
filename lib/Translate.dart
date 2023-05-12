@@ -8,14 +8,24 @@ mixin Translate{
         'fa' : 'Persian',
         'en' : 'English',
         'ar' : 'Arabic',
-        'ai' : 'Artificial intelligence'
+        'ai' : 'Artificial intelligence',
+        'calendar': 'Calendar',
+        'today' : 'To Day',
+        'setting' : 'Settings',
+        'event' : 'Event',
+        'events' : 'Events'
       },
       'fa' : {
         'ENT_LANG' : 'لطفا زبان خود را انتخاب کنید:',
         'fa' : "فارسی",
         'en' : 'انگلیسی',
         'ar' : 'عربی',
-        'ai' : 'هوش مصنوعی'
+        'ai' : 'هوش مصنوعی',
+        'calendar' : 'تقویم',
+        'today' : 'امروز',
+        'setting' : 'تنظیمات',
+        'event' : 'رویداد',
+        'events' : 'رویداد ها'
       }
     };
     var getMatching = Text.split(':');

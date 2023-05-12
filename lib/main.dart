@@ -2,13 +2,12 @@ import 'dart:convert';
 import 'package:calendarapp/Translate.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 const List<String> array_lang = <String>['English', 'فارسی', 'العربی'];
 
-
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 void testAlert(BuildContext context, String title, String contents) {
   var alert = AlertDialog(
@@ -19,7 +18,7 @@ void testAlert(BuildContext context, String title, String contents) {
         style: TextButton.styleFrom(
           textStyle: Theme.of(context).textTheme.labelLarge,
         ),
-        child: Icon(Icons.close),
+        child: const Icon(Icons.close),
         onPressed: () {
           Navigator.of(context).pop();
         },
@@ -47,7 +46,7 @@ class _MyAppState extends State<MyApp> with Translate {
 
   @override
   void initState() {
-      super.initState();
+    super.initState();
     fetchData();
   }
 
@@ -90,7 +89,7 @@ class _MyAppState extends State<MyApp> with Translate {
     List<DataColumn> columns =
         daysOfWeek.map((day) => DataColumn(label: Text(day))).toList();
     List<List<dynamic>> chunks = chunk(data, 7);
-    List<DataRow> rows_chunk = [];
+    List<DataRow> rowsChunk = [];
     for (var i = 0; i < chunks.length; i++) {
       var rowCells = chunks[i].map((item) {
         var ColorReturn = [255, 0, 0, 0];
@@ -100,21 +99,38 @@ class _MyAppState extends State<MyApp> with Translate {
         if (item['closed'] && item['is_month']) {
           ColorReturn = [255, 129, 0, 0];
         }
+        var eventList = item['events']['event'];
+        print(Map<dynamic, dynamic>.from(json.decode(json.encode(eventList))));
+        // print(eventList.toString().runtimeType);
+        // List<String> j = eventList['jalali'] != null ? List<String>.from(eventList['jalali']) : [];
+        // List<String> l = eventList['lunar'] != null ? List<String>.from(eventList['lunar']) : [];
+        // List<String> g = eventList['gregorian'] != null ? List<String>.from(eventList['gregorian']) : [];
+        // String event_days = '';
+        // j.forEach((i) {
+        //   event_days += i.runtimeType.toString();
+        // });
+        // l.forEach((i) {
+        //   print(i); // تابع c به print جایگزین شده است
+        //   event_days += i.runtimeType.toString();
+        // });
+        // g.forEach((i) {
+        //   event_days += i.runtimeType.toString();
+        // });
         if (item['to_day']) {
           return DataCell(Builder(
             builder: (context) {
               return OutlinedButton(
                 style: OutlinedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 8, 94, 27),
-                    side: BorderSide(color: Colors.transparent)),
+                    backgroundColor: const Color.fromARGB(255, 8, 94, 27),
+                    side: const BorderSide(color: Colors.transparent)),
                 onPressed: () {
-                  testAlert(context, 'رویداد ها', 'اینم رویداد ها\nیکی دیگه');
+                  testAlert(context, Trans('en:events'), 'event_days');
                 },
                 child: Tooltip(
-                  message: 'امروز',
+                  message: Trans('en:today'),
                   child: Text(
                     '${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}',
-                    style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                    style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                   ),
                 ),
               );
@@ -130,17 +146,17 @@ class _MyAppState extends State<MyApp> with Translate {
         ));
       }).toList();
       if (rowCells.length == 7) {
-        rows_chunk.add(DataRow(cells: [...rowCells].reversed.toList()));
+        rowsChunk.add(DataRow(cells: [...rowCells].reversed.toList()));
       } else {
         for (var b = rowCells.length; b <= 6; b++) {
-          rowCells.add(DataCell(Text(' ')));
+          rowCells.add(const DataCell(Text(' ')));
         }
-        rows_chunk.add(DataRow(cells: [...rowCells].reversed.toList()));
+        rowsChunk.add(DataRow(cells: [...rowCells].reversed.toList()));
       }
       //  print(i);
     }
     // create data rows
-    List<DataRow> rows = [...rows_chunk];
+    List<DataRow> rows = [...rowsChunk];
 
     // create data table
     SingleChildScrollView dataTable = SingleChildScrollView(
@@ -159,20 +175,20 @@ class _MyAppState extends State<MyApp> with Translate {
             length: 2,
             child: Scaffold(
               appBar: AppBar(
-                bottom: TabBar(
+                bottom: const TabBar(
                   tabs: [
                     Tab(icon: Icon(Icons.home), text: 'Calendar'),
                     Tab(icon: Icon(Icons.settings), text: 'Setting'),
                   ],
                 ),
-                title: Text('جدول از داده‌های جیسون'),
+                title: const Text('جدول از داده‌های جیسون'),
               ),
               body: TabBarView(
                 children: [
                   Scaffold(
                     body: Center(
                       child: data.isEmpty
-                          ? CircularProgressIndicator() // show loading indicator if data is not fetched yet
+                          ? const CircularProgressIndicator() // show loading indicator if data is not fetched yet
                           : SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: DataTable(columns: columns, rows: rows),
@@ -183,32 +199,40 @@ class _MyAppState extends State<MyApp> with Translate {
                       child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                          Trans('fa:ENT_LANG')
-                      ),
-
-                    DropdownButton<String>(
-                      value: dropdownValue,
-                      icon: const Icon(Icons.arrow_downward),
-                      elevation: 16,
-                      style: const TextStyle(color: Colors.deepPurple),
-                      underline: Container(
-                        height: 2,
-                        color: Colors.deepPurpleAccent,
-                      ),
-                      onChanged: (String? value) {
-                        // This is called when the user selects an item.
-                        setState(() {
-                          dropdownValue = value!;
-                        });
-                      },
-                      items: array_lang.map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    )
+                      Text(Trans('fa:ENT_LANG')),
+                      DropdownButton<String>(
+                        value: dropdownValue,
+                        icon: const Icon(Icons.arrow_downward),
+                        elevation: 16,
+                        style: const TextStyle(color: Colors.deepPurple),
+                        underline: Container(
+                          height: 2,
+                          color: Colors.deepPurpleAccent,
+                        ),
+                        onChanged: (String? value) {
+                          var rs = value;
+                          if (value == 'English') {
+                            rs = 'en';
+                          }
+                          if (value == 'فارسی') {
+                            rs = 'fa';
+                          }
+                          if (value == 'فارسی') {
+                            rs = 'fa';
+                          }
+                          // This is called when the user selects an item.
+                          setState(() {
+                            dropdownValue = value!;
+                          });
+                        },
+                        items: array_lang
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      )
                     ],
                   )),
                 ],
