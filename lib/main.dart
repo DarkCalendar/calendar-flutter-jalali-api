@@ -49,7 +49,13 @@ class _MyAppState extends State<MyApp> with Translate {
     super.initState();
     fetchData();
   }
-
+  dynamic Converting(List app){
+    var execute;
+    app.forEach((element) {
+      execute = element;
+    });
+    return execute;
+  }
   void fetchData() async {
     // var url = Uri.parse('http://127.0.0.1:8000/api/get');
     var url = Uri.parse(
@@ -100,22 +106,7 @@ class _MyAppState extends State<MyApp> with Translate {
           ColorReturn = [255, 129, 0, 0];
         }
         var eventList = item['events']['event'];
-        print(Map<dynamic, dynamic>.from(json.decode(json.encode(eventList))));
-        // print(eventList.toString().runtimeType);
-        // List<String> j = eventList['jalali'] != null ? List<String>.from(eventList['jalali']) : [];
-        // List<String> l = eventList['lunar'] != null ? List<String>.from(eventList['lunar']) : [];
-        // List<String> g = eventList['gregorian'] != null ? List<String>.from(eventList['gregorian']) : [];
-        // String event_days = '';
-        // j.forEach((i) {
-        //   event_days += i.runtimeType.toString();
-        // });
-        // l.forEach((i) {
-        //   print(i); // تابع c به print جایگزین شده است
-        //   event_days += i.runtimeType.toString();
-        // });
-        // g.forEach((i) {
-        //   event_days += i.runtimeType.toString();
-        // });
+        print(eventList);
         if (item['to_day']) {
           return DataCell(Builder(
             builder: (context) {
@@ -124,8 +115,14 @@ class _MyAppState extends State<MyApp> with Translate {
                     backgroundColor: const Color.fromARGB(255, 8, 94, 27),
                     side: const BorderSide(color: Colors.transparent)),
                 onPressed: () {
-                  testAlert(context, Trans('en:events'), 'event_days');
-                  testAlert(context, 'رویداد ها', 'events');
+                  var joiner = (List lement) {
+                    return lement.join("\n");
+                  };
+                  print(joiner(Converting(eventList['lunar'])) + "\n" + joiner(Converting(eventList['jalali'])) + "\n" + joiner(Converting(eventList['gregorian'])));
+                  print(eventList['lunar'][0].length);
+                  // [0]
+                  testAlert(context, Trans('en:events'), joiner(Converting(eventList['lunar'])));
+                  // testAlert(context, 'رویداد ها', 'events');
                 },
                 child: Tooltip(
                   message: Trans('en:today'),
