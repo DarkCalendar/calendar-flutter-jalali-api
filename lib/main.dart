@@ -116,6 +116,17 @@ class _MyAppState extends State<MyApp> with Translate {
         // g.forEach((i) {
         //   event_days += i.runtimeType.toString();
         // });
+        var events = "";
+        if (eventList.containsKey('lunar')) {
+          events += eventList['lunar'].entries.toList().join("\n") + "\n";
+        }
+        if (eventList.containsKey('jalali')) {
+          events += eventList['jalali'].entries.toList().join("\n") + "\n";
+        }
+
+        if (eventList.containsKey('gregorian')) {
+          events += eventList['gregorian'].entries.toList().join("\n") + "\n";
+        }
         if (item['to_day']) {
           return DataCell(Builder(
             builder: (context) {
@@ -125,6 +136,7 @@ class _MyAppState extends State<MyApp> with Translate {
                     side: const BorderSide(color: Colors.transparent)),
                 onPressed: () {
                   testAlert(context, Trans('en:events'), 'event_days');
+                  testAlert(context, 'رویداد ها', events);
                 },
                 child: Tooltip(
                   message: Trans('en:today'),
