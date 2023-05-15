@@ -59,9 +59,9 @@ class _MyAppState extends State<MyApp> with Translate {
   }
 
   void fetchData() async {
-    var url = Uri.parse('http://127.0.0.1:8000/api/get');
-    // var url = Uri.parse(
-    // 'https://raw.githubusercontent.com/DarkCalendar/.github/main/api/json/api-test-date-and-time-jalali.json');
+    // var url = Uri.parse('http://127.0.0.1:8000/api/get');
+    var url = Uri.parse(
+    'https://raw.githubusercontent.com/DarkCalendar/.github/main/api/json/api-test-date-and-time-jalali.json');
     var response = await http.get(url);
 
     if (response.statusCode == 200) {
