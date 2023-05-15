@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:open_settings/open_settings.dart';
-import 'package:flutter_platform_alert/flutter_platform_alert.dart';
 
 const List<String> array_lang = <String>['English', 'فارسی', 'العربی'];
 
