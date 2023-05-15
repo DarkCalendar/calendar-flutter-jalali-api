@@ -39,6 +39,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   http: ^0.13.5
   path_provider: ^2.0.15
+  connectivity: ^3.0.6
+  open_settings: ^2.0.2
+  flutter_platform_alert: ^0.4.0
 
 dev_dependencies:
   flutter_test:

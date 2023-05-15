@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:open_settings/open_settings.dart';
+import 'package:flutter_platform_alert/flutter_platform_alert.dart';
 
 const List<String> array_lang = <String>['English', 'فارسی', 'العربی'];
 
@@ -42,12 +45,22 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> with Translate {
   String dropdownValue = array_lang.first;
+  bool _isConnected = true;
   List<dynamic> data = [];
-
   @override
+  Future<void> checkInternetConnection() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _isConnected = false;
+      });
+    }
+  }
+
   void initState() {
     super.initState();
     fetchData();
+    checkInternetConnection();
   }
 
   dynamic joinAndConverting(List app) {
@@ -61,7 +74,7 @@ class _MyAppState extends State<MyApp> with Translate {
   void fetchData() async {
     // var url = Uri.parse('http://127.0.0.1:8000/api/get');
     var url = Uri.parse(
-    'https://raw.githubusercontent.com/DarkCalendar/.github/main/api/json/api-test-date-and-time-jalali.json');
+        'https://raw.githubusercontent.com/DarkCalendar/.github/main/api/json/api-test-date-and-time-jalali.json');
     var response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -69,7 +82,6 @@ class _MyAppState extends State<MyApp> with Translate {
         data = jsonDecode(response.body)['full'];
       });
     } else {
-      testAlert(context, 'title', 'contents');
       print('Request failed with status: ${response.statusCode}.');
     }
   }
@@ -174,7 +186,6 @@ class _MyAppState extends State<MyApp> with Translate {
     }
     // create data rows
     List<DataRow> rows = [...rowsChunk];
-
     // create data table
     SingleChildScrollView dataTable = SingleChildScrollView(
       scrollDirection: Axis.vertical,
@@ -182,80 +193,133 @@ class _MyAppState extends State<MyApp> with Translate {
     );
     // DataTable dataTable = DataTable(columns: columns, rows: rows);
     // print(asTR('en:ENT_LANG'));
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: MaterialApp(
-          title: 'Calendar API',
-          theme: ThemeData(primarySwatch: Colors.blue),
-          debugShowCheckedModeBanner: false,
-          home: DefaultTabController(
-            length: 2,
-            child: Scaffold(
-              appBar: AppBar(
-                bottom: const TabBar(
-                  tabs: [
-                    Tab(icon: Icon(Icons.home), text: 'Calendar'),
-                    Tab(icon: Icon(Icons.settings), text: 'Setting'),
+    Directionality SUD(BodyCalendar) {
+      return Directionality(
+        textDirection: TextDirection.ltr,
+        child: MaterialApp(
+            title: 'Calendar API',
+            theme: ThemeData(primarySwatch: Colors.blue),
+            debugShowCheckedModeBanner: false,
+            home: DefaultTabController(
+              length: 2,
+              child: Scaffold(
+                appBar: AppBar(
+                  bottom: const TabBar(
+                    tabs: [
+                      Tab(icon: Icon(Icons.home), text: 'Calendar'),
+                      Tab(icon: Icon(Icons.settings), text: 'Setting'),
+                    ],
+                  ),
+                  title: const Text('جدول از داده‌های جیسون'),
+                ),
+                body: TabBarView(
+                  children: [
+                    BodyCalendar,
+                    Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(Trans('fa:ENT_LANG')),
+                        DropdownButton<String>(
+                          value: dropdownValue,
+                          icon: const Icon(Icons.arrow_downward),
+                          elevation: 16,
+                          style: const TextStyle(color: Colors.deepPurple),
+                          underline: Container(
+                            height: 2,
+                            color: Colors.deepPurpleAccent,
+                          ),
+                          onChanged: (String? value) {
+                            var rs = value;
+                            if (value == 'English') {
+                              rs = 'en';
+                            }
+                            if (value == 'فارسی') {
+                              rs = 'fa';
+                            }
+                            if (value == 'فارسی') {
+                              rs = 'fa';
+                            }
+                            // This is called when the user selects an item.
+                            setState(() {
+                              dropdownValue = value!;
+                            });
+                          },
+                          items: array_lang
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        )
+                      ],
+                    )),
                   ],
                 ),
-                title: const Text('جدول از داده‌های جیسون'),
               ),
-              body: TabBarView(
-                children: [
-                  Scaffold(
-                    body: Center(
-                      child: data.isEmpty
-                          ? const CircularProgressIndicator() // show loading indicator if data is not fetched yet
-                          : SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: DataTable(columns: columns, rows: rows),
-                            ), // show the data table when data is available
-                    ),
+            )),
+      );
+    }
+
+    Scaffold fnDIR(NextPage) {
+      Scaffold BodyCalendar = Scaffold(
+        body: Center(
+          child: Builder(
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Internet Connection'),
+                content: const Text(
+                    'No internet Data Connection. Please Turn on wifi or Mobile data.'),
+                actions: [
+                  TextButton(
+                    child: const Icon(Icons.exit_to_app),
+                    onPressed: () {
+                      exit(0);
+                    },
                   ),
-                  Center(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(Trans('fa:ENT_LANG')),
-                      DropdownButton<String>(
-                        value: dropdownValue,
-                        icon: const Icon(Icons.arrow_downward),
-                        elevation: 16,
-                        style: const TextStyle(color: Colors.deepPurple),
-                        underline: Container(
-                          height: 2,
-                          color: Colors.deepPurpleAccent,
-                        ),
-                        onChanged: (String? value) {
-                          var rs = value;
-                          if (value == 'English') {
-                            rs = 'en';
-                          }
-                          if (value == 'فارسی') {
-                            rs = 'fa';
-                          }
-                          if (value == 'فارسی') {
-                            rs = 'fa';
-                          }
-                          // This is called when the user selects an item.
-                          setState(() {
-                            dropdownValue = value!;
-                          });
-                        },
-                        items: array_lang
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                      )
-                    ],
-                  )),
+                  TextButton(
+                    child: const Icon(Icons.wifi),
+                    onPressed: () {
+                      OpenSettings.openWIFISetting();
+                    },
+                  ),
+                  TextButton(
+                    child: const Icon(Icons.check_sharp),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) {
+                          return SUD(fnDIR(NextPage));
+                        }),
+                      );
+                    },
+                  )
                 ],
-              ),
-            ),
-          )),
-    );
+              );
+            },
+          ),
+        ),
+      );
+      if (!_isConnected) {
+        BodyCalendar = Scaffold(
+          body: Center(
+            child: data.isEmpty
+                ? const CircularProgressIndicator() // show loading indicator if data is not fetched yet
+                : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Column(
+                      children: [DataTable(columns: columns, rows: rows)],
+                    ),
+                  ), // show the data table when data is available
+          ),
+        );
+      }
+      return BodyCalendar;
+    }
+
+    Scaffold BodyCalendar = fnDIR(DataTable(columns: columns, rows: rows));
+
+    return SUD(BodyCalendar);
   }
 }
