@@ -49,17 +49,19 @@ class _MyAppState extends State<MyApp> with Translate {
     super.initState();
     fetchData();
   }
-  dynamic Converting(List app){
+
+  dynamic joinAndConverting(List app) {
     var execute;
     app.forEach((element) {
       execute = element;
     });
-    return execute;
+    return execute.join("\n");
   }
+
   void fetchData() async {
-    // var url = Uri.parse('http://127.0.0.1:8000/api/get');
-    var url = Uri.parse(
-        'https://raw.githubusercontent.com/DarkCalendar/.github/main/api/json/api-test-date-and-time-jalali.json');
+    var url = Uri.parse('http://127.0.0.1:8000/api/get');
+    // var url = Uri.parse(
+    // 'https://raw.githubusercontent.com/DarkCalendar/.github/main/api/json/api-test-date-and-time-jalali.json');
     var response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -67,6 +69,7 @@ class _MyAppState extends State<MyApp> with Translate {
         data = jsonDecode(response.body)['full'];
       });
     } else {
+      testAlert(context, 'title', 'contents');
       print('Request failed with status: ${response.statusCode}.');
     }
   }
@@ -98,50 +101,66 @@ class _MyAppState extends State<MyApp> with Translate {
     List<DataRow> rowsChunk = [];
     for (var i = 0; i < chunks.length; i++) {
       var rowCells = chunks[i].map((item) {
-        var ColorReturn = [255, 0, 0, 0];
+        var cr = [255, 0, 0, 0];
         if (!item['is_month']) {
-          ColorReturn = [169, 169, 169, 1];
+          cr = [169, 169, 169, 1];
         }
         if (item['closed'] && item['is_month']) {
-          ColorReturn = [255, 129, 0, 0];
+          cr = [255, 129, 0, 0];
         }
         var eventList = item['events']['event'];
-        print(eventList);
+        var bc = [255, 255, 255, 255];
+        var msg = "";
         if (item['to_day']) {
-          return DataCell(Builder(
-            builder: (context) {
-              return OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 8, 94, 27),
-                    side: const BorderSide(color: Colors.transparent)),
-                onPressed: () {
-                  var joiner = (List lement) {
-                    return lement.join("\n");
-                  };
-                  print(joiner(Converting(eventList['lunar'])) + "\n" + joiner(Converting(eventList['jalali'])) + "\n" + joiner(Converting(eventList['gregorian'])));
-                  print(eventList['lunar'][0].length);
-                  // [0]
-                  testAlert(context, Trans('en:events'), joiner(Converting(eventList['lunar'])));
-                  // testAlert(context, 'رویداد ها', 'events');
-                },
-                child: Tooltip(
-                  message: Trans('en:today'),
-                  child: Text(
-                    '${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}',
-                    style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                  ),
-                ),
-              );
-            },
-          ));
+          bc = [255, 8, 94, 27];
+          msg = Trans('en:today');
         }
-
-        return DataCell(Text(
-          '${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}',
-          style: TextStyle(
-              color: Color.fromARGB(ColorReturn[0], ColorReturn[1],
-                  ColorReturn[2], ColorReturn[3])),
+        return DataCell(Builder(
+          builder: (context) {
+            return OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(bc[0], bc[1], bc[2], bc[3]),
+                  side: const BorderSide(color: Colors.transparent)),
+              onPressed: () {
+                var out = '';
+                var event_exist = true;
+                if (eventList.containsKey('lunar') &&
+                    eventList['lunar'].length > 0) {
+                  event_exist = false;
+                  out += joinAndConverting(eventList['lunar']);
+                  out += "\n";
+                }
+                if (eventList.containsKey('jalali') &&
+                    eventList['jalali'].length > 0) {
+                  event_exist = false;
+                  out += joinAndConverting(eventList['jalali']);
+                  out += "\n";
+                }
+                if (eventList.containsKey('gregorian') &&
+                    eventList['gregorian'].length > 0) {
+                  event_exist = false;
+                  out += joinAndConverting(eventList['gregorian']);
+                  out += "\n";
+                }
+                if (event_exist) {
+                  out += "بدون رویداد";
+                }
+                // [0]
+                testAlert(context, Trans('en:events'), out.trim());
+                // testAlert(context, 'رویداد ها', 'events');
+              },
+              child: Tooltip(
+                message: msg,
+                child: Text(
+                  '${item['date']['jalali'][0]} / ${item['date']['jalali'][1]} / ${item['date']['jalali'][2]}',
+                  style: TextStyle(
+                      color: Color.fromARGB(cr[0], cr[1], cr[2], cr[3])),
+                ),
+              ),
+            );
+          },
         ));
+        // }
       }).toList();
       if (rowCells.length == 7) {
         rowsChunk.add(DataRow(cells: [...rowCells].reversed.toList()));
