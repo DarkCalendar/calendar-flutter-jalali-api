@@ -302,6 +302,7 @@ class _MyAppState extends State<MyApp> with Translate {
         ),
       );
       if (_isConnected) {
+        fetchData();
         BodyCalendar = Scaffold(
           body: Center(
             child: data.isEmpty
