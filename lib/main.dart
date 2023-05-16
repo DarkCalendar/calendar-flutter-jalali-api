@@ -6,6 +6,8 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:open_settings/open_settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 
 const List<String> array_lang = <String>['English', 'فارسی', 'العربی'];
 
@@ -46,7 +48,7 @@ class _MyAppState extends State<MyApp> with Translate {
   String dropdownValue = array_lang.first;
   bool _isConnected = true;
   List<dynamic> data = [];
-  @override
+  late SharedPreferences prefs;
   Future<void> checkInternetConnection() async {
     var connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
@@ -56,8 +58,15 @@ class _MyAppState extends State<MyApp> with Translate {
     }
   }
 
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  Future<void> initPrefs() async {
+    prefs = await _prefs;
+  }
+
+  @override
   void initState() {
     super.initState();
+    initPrefs();
     fetchData();
     checkInternetConnection();
   }
@@ -87,14 +96,15 @@ class _MyAppState extends State<MyApp> with Translate {
 
   @override
   Widget build(BuildContext context) {
+    String lang = prefs.getString('lang').toString();
     List<String> daysOfWeek = [
-      'جمعه',
-      'پنجشنبه',
-      'چهارشنبه',
-      'سه شنبه',
-      'دوشنبه',
-      'یکشنبه',
-      'شنبه',
+      Trans('$lang:fri'),
+      Trans('$lang:thu'),
+      Trans('$lang:wed'),
+      Trans('$lang:tue'),
+      Trans('$lang:mon'),
+      Trans('$lang:sun'),
+      Trans('$lang:sat'),
     ];
     List<List<T>> chunk<T>(List<T> list, int chunkSize) {
       List<List<T>> chunks = [];
@@ -124,7 +134,7 @@ class _MyAppState extends State<MyApp> with Translate {
         var msg = "";
         if (item['to_day']) {
           bc = [255, 8, 94, 27];
-          msg = Trans('en:today');
+          msg = Trans('$lang:today');
         }
         return DataCell(Builder(
           builder: (context) {
@@ -154,11 +164,9 @@ class _MyAppState extends State<MyApp> with Translate {
                   out += "\n";
                 }
                 if (event_exist) {
-                  out += "بدون رویداد";
+                  out += Trans('$lang:nevent');
                 }
-                // [0]
-                testAlert(context, Trans('en:events'), out.trim());
-                // testAlert(context, 'رویداد ها', 'events');
+                testAlert(context, Trans('$lang:events'), out.trim());
               },
               child: Tooltip(
                 message: msg,
@@ -171,7 +179,6 @@ class _MyAppState extends State<MyApp> with Translate {
             );
           },
         ));
-        // }
       }).toList();
       if (rowCells.length == 7) {
         rowsChunk.add(DataRow(cells: [...rowCells].reversed.toList()));
@@ -181,7 +188,6 @@ class _MyAppState extends State<MyApp> with Translate {
         }
         rowsChunk.add(DataRow(cells: [...rowCells].reversed.toList()));
       }
-      //  print(i);
     }
     // create data rows
     List<DataRow> rows = [...rowsChunk];
@@ -190,9 +196,19 @@ class _MyAppState extends State<MyApp> with Translate {
       scrollDirection: Axis.vertical,
       child: DataTable(columns: columns, rows: rows),
     );
-    // DataTable dataTable = DataTable(columns: columns, rows: rows);
-    // print(asTR('en:ENT_LANG'));
     Directionality SUD(BodyCalendar) {
+      if (prefs.getString('lang') == null) {
+        prefs.setString('lang', 'fa');
+        dropdownValue = "فارسی";
+      } else {
+        var g_p_l = prefs.getString('lang');
+        dropdownValue = "فارسی";
+        if (g_p_l == 'en') {
+          dropdownValue = "English";
+        } else if (g_p_l == 'ar') {
+          dropdownValue = "العربی";
+        }
+      }
       return Directionality(
         textDirection: TextDirection.ltr,
         child: MaterialApp(
@@ -203,10 +219,14 @@ class _MyAppState extends State<MyApp> with Translate {
               length: 2,
               child: Scaffold(
                 appBar: AppBar(
-                  bottom: const TabBar(
+                  bottom: TabBar(
                     tabs: [
-                      Tab(icon: Icon(Icons.home), text: 'Calendar'),
-                      Tab(icon: Icon(Icons.settings), text: 'Setting'),
+                      Tab(
+                          icon: const Icon(Icons.home),
+                          text: Trans('$lang:calendar')),
+                      Tab(
+                          icon: const Icon(Icons.settings),
+                          text: Trans('$lang:setting')),
                     ],
                   ),
                   title: const Text('جدول از داده‌های جیسون'),
@@ -218,7 +238,7 @@ class _MyAppState extends State<MyApp> with Translate {
                         child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(Trans('fa:ENT_LANG')),
+                        Text(Trans('$lang:ENT_LANG')),
                         DropdownButton<String>(
                           value: dropdownValue,
                           icon: const Icon(Icons.arrow_downward),
@@ -229,20 +249,24 @@ class _MyAppState extends State<MyApp> with Translate {
                             color: Colors.deepPurpleAccent,
                           ),
                           onChanged: (String? value) {
-                            var rs = value;
+                            String rs = value.toString();
                             if (value == 'English') {
                               rs = 'en';
                             }
                             if (value == 'فارسی') {
                               rs = 'fa';
                             }
-                            if (value == 'فارسی') {
-                              rs = 'fa';
+                            if (value == 'العربی') {
+                              rs = 'ar';
                             }
+                            dropdownValue = value!;
+                            prefs.setString('lang', rs);
+                            lang = prefs.getString('lang').toString();
                             // This is called when the user selects an item.
                             setState(() {
-                              dropdownValue = value!;
+                              dropdownValue = value;
                             });
+                            prefs.setString('lang', rs);
                           },
                           items: array_lang
                               .map<DropdownMenuItem<String>>((String value) {
@@ -322,5 +346,6 @@ class _MyAppState extends State<MyApp> with Translate {
     Scaffold BodyCalendar = fnDIR(DataTable(columns: columns, rows: rows));
 
     return SUD(BodyCalendar);
+    // }
   }
 }
