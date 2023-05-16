@@ -262,6 +262,7 @@ class _MyAppState extends State<MyApp> with Translate {
     }
 
     Scaffold fnDIR(NextPage) {
+      checkInternetConnection();
       Scaffold BodyCalendar = Scaffold(
         body: Center(
           child: Builder(
