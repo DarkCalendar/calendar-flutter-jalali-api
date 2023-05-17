@@ -56,3 +56,4 @@ calendarapp.iml
 .dart_tool
 .idea
 pubspec.lock
+.flutter-plugins*
