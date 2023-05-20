@@ -3,7 +3,7 @@ import 'package:calendarapp/Translate.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+// import 'package:path_provider/path_provider.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:open_settings/open_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +13,7 @@ const List<String> array_lang = <String>['English', 'فارسی', 'العربی'
 
 void main() => runApp(const MyApp());
 
-void testAlert(BuildContext context, String title, String contents) {
+void Alert(BuildContext context, String title, String contents) {
   var alert = AlertDialog(
     title: Text(title),
     content: Text(contents),
@@ -48,7 +48,7 @@ class _MyAppState extends State<MyApp> with Translate {
   String dropdownValue = array_lang.first;
   bool _isConnected = true;
   List<dynamic> data = [];
-  late SharedPreferences prefs;
+  SharedPreferences? prefs;
   Future<void> checkInternetConnection() async {
     var connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
@@ -58,21 +58,21 @@ class _MyAppState extends State<MyApp> with Translate {
     }
   }
 
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   Future<void> initPrefs() async {
-    prefs = await _prefs;
+    // final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
   }
 
   @override
   void initState() {
-    super.initState();
     initPrefs();
     fetchData();
     checkInternetConnection();
+    super.initState();
   }
 
-  dynamic joinAndConverting(List app) {
-    var execute;
+  dynamic joinAndConverting(List<dynamic> app) {
+    dynamic execute;
     app.forEach((element) {
       execute = element;
     });
@@ -96,7 +96,11 @@ class _MyAppState extends State<MyApp> with Translate {
 
   @override
   Widget build(BuildContext context) {
-    String lang = prefs.getString('lang').toString();
+    String? lang = prefs?.getString('lang');
+    if (lang == null) {
+      prefs?.setString('lang', 'fa');
+      lang = prefs?.getString('lang');
+    }
     List<String> daysOfWeek = [
       Trans('$lang:fri'),
       Trans('$lang:thu'),
@@ -131,7 +135,7 @@ class _MyAppState extends State<MyApp> with Translate {
         }
         var eventList = item['events']['event'];
         var bc = [255, 255, 255, 255];
-        var msg = "";
+        var msg = '';
         if (item['to_day']) {
           bc = [255, 8, 94, 27];
           msg = Trans('$lang:today');
@@ -163,10 +167,9 @@ class _MyAppState extends State<MyApp> with Translate {
                   out += joinAndConverting(eventList['gregorian']);
                   out += "\n";
                 }
-                if (event_exist) {
-                  out += Trans('$lang:nevent');
-                }
-                testAlert(context, Trans('$lang:events'), out.trim());
+                if (event_exist) out += Trans('$lang:nevent');
+
+                Alert(context, Trans('$lang:events'), out.trim());
               },
               child: Tooltip(
                 message: msg,
@@ -192,16 +195,13 @@ class _MyAppState extends State<MyApp> with Translate {
     // create data rows
     List<DataRow> rows = [...rowsChunk];
     // create data table
-    SingleChildScrollView dataTable = SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: DataTable(columns: columns, rows: rows),
-    );
+
     Directionality SUD(BodyCalendar) {
-      if (prefs.getString('lang') == null) {
-        prefs.setString('lang', 'fa');
+      if (prefs?.getString('lang') == null) {
+        prefs?.setString('lang', 'fa');
         dropdownValue = "فارسی";
       } else {
-        var g_p_l = prefs.getString('lang');
+        var g_p_l = prefs?.getString('lang');
         dropdownValue = "فارسی";
         if (g_p_l == 'en') {
           dropdownValue = "English";
@@ -260,13 +260,13 @@ class _MyAppState extends State<MyApp> with Translate {
                               rs = 'ar';
                             }
                             dropdownValue = value!;
-                            prefs.setString('lang', rs);
-                            lang = prefs.getString('lang').toString();
+                            prefs?.setString('lang', rs);
+                            lang = prefs?.getString('lang').toString();
                             // This is called when the user selects an item.
                             setState(() {
                               dropdownValue = value;
                             });
-                            prefs.setString('lang', rs);
+                            prefs?.setString('lang', rs);
                           },
                           items: array_lang
                               .map<DropdownMenuItem<String>>((String value) {
@@ -292,9 +292,8 @@ class _MyAppState extends State<MyApp> with Translate {
           child: Builder(
             builder: (context) {
               return AlertDialog(
-                title: const Text('Internet Connection'),
-                content: const Text(
-                    'No internet Data Connection. Please Turn on wifi or Mobile data.'),
+                title: Text(Trans('$lang:internetERR')),
+                content: Text(Trans('$lang:internetDesc')),
                 actions: [
                   TextButton(
                     child: const Icon(Icons.exit_to_app),

@@ -1,8 +1,8 @@
 mixin Translate {
   String APP_NAME_USES = "HELLO APP";
 
-  dynamic? Trans(String Text) {
-    Map<String, Map> Words = {
+  dynamic Trans(String Text) {
+    Map<String, Map<dynamic, dynamic>> words = {
       'en': {
         'ENT_LANG': 'Please select your preferred language:',
         'fa': 'Persian',
@@ -72,6 +72,6 @@ mixin Translate {
       }
     };
     var getMatching = Text.split(':');
-    return Words[getMatching[0]]![getMatching[1]];
+    return words[getMatching[0]]![getMatching[1]];
   }
 }
